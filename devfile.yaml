@@ -45,7 +45,6 @@ components:
     # pod-overrides: {"metadata": {"annotations": {"io.kubernetes.cri-o.Devices":"/dev/fuse,/dev/net/tun","io.openshift.nested-podman":""}}}
     # container-overrides: {"securityContext": {"procMount": "Unmasked"}}
     pod-overrides: {"metadata": {"annotations": {"io.kubernetes.cri-o.Devices":"/dev/fuse","io.openshift.nested-podman":""}}}
-
   container: 
     image: quay.io/cgruver0/che/che-dev-image:nested
     memoryLimit: 6Gi
@@ -67,20 +66,3 @@ components:
       value: /tmp/podman.sock
     - name: DOCKER_CMD
       value: podman
-  image:
-    imageName: quay.io/cgruver0/che/che-dev-image:nested
-    autoBuild: true
-    dockerfile:
-      uri: podman-image/podman-runner.Containerfile
-
-commands:
-- exec:
-    label: "Start Podman Service"
-    component: dev-tools
-    workingDir: ${PROJECTS_ROOT}
-    commandLine: "unset CONTAINER_HOST && podman --log-level debug system service --time=0 unix:///tmp/podman.sock"
-    group:
-      kind: run
-      isDefault: true
-  id: start-podman
-
