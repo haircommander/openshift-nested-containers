@@ -81,15 +81,15 @@ components:
     mountSources: true
     memoryLimit: 256M
 commands:
-- exec:
-    label: "Start Podman Service"
-    component: dev-tools
-    workingDir: ${PROJECTS_ROOT}
-    commandLine: "unset CONTAINER_HOST && podman --log-level debug system service --time=0 unix:///tmp/podman.sock"
-    group:
-      kind: run
-      isDefault: true
-  id: start-podman
+#- exec:
+#    label: "Start Podman Service"
+#    component: dev-tools
+#    workingDir: ${PROJECTS_ROOT}
+ #   commandLine: "unset CONTAINER_HOST && podman --log-level debug system service --time=0 unix:///tmp/podman.sock"
+ #   group:
+  #    kind: run
+   #   isDefault: true
+  #id: start-podman
 - exec:
     label: "Start Localstack Service"
     component: dev-tools
