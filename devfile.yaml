@@ -66,3 +66,8 @@ components:
       value: /tmp/podman.sock
     - name: DOCKER_CMD
       value: podman
+  image:
+    imageName: quay.io/cgruver0/che/che-dev-image:nested
+    autoBuild: true
+    dockerfile:
+      uri: podman-image/podman-runner.Containerfile
