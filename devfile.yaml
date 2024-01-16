@@ -70,9 +70,6 @@ components:
     autoBuild: true
     dockerfile:
       uri: podman-image/podman-runner.Containerfile
-- volume:
-    size: 10Gi
-  name: projects
 
 commands:
 - exec:
