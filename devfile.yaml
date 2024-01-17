@@ -42,9 +42,7 @@ projects:
 components:
 - name: dev-tools
   attributes:
-    # pod-overrides: {"metadata": {"annotations": {"io.kubernetes.cri-o.Devices":"/dev/fuse,/dev/net/tun","io.openshift.nested-podman":""}}}
-    # container-overrides: {"securityContext": {"procMount": "Unmasked"}}
-    pod-overrides: {"metadata": {"annotations": {"io.kubernetes.cri-o.Devices":"/dev/fuse","io.openshift.nested-podman":""}}}
+    pod-overrides: {"metadata": {"annotations": {"io.kubernetes.cri-o.Devices":"/dev/fuse"}}, "spec": {"securityContext": {"seLinuxOptions": {"type": "container_engine_t"}}}}    container-overrides: {"securityContext": {"procMount": "Unmasked"}}
   container: 
     image: quay.io/cgruver0/che/che-dev-image:nested
     memoryLimit: 6Gi
@@ -66,8 +64,44 @@ components:
       value: /tmp/podman.sock
     - name: DOCKER_CMD
       value: podman
-  image:
-    imageName: quay.io/cgruver0/che/che-dev-image:nested
-    autoBuild: true
-    dockerfile:
-      uri: podman-image/podman-runner.Containerfile
+- volume:
+    size: 10Gi
+  name: projects
+- name: oc-cli
+  container:
+    args:
+      - '-c'
+      - >-
+        mkdir -p /projects/bin && cp /usr/bin/oc /projects/bin/oc && cp /usr/bin/kubectl /projects/bin/kubectl
+    command:
+      - /bin/bash
+    image: image-registry.openshift-image-registry.svc:5000/openshift/cli:latest
+    sourceMapping: /projects
+    mountSources: true
+    memoryLimit: 256M
+commands:
+- exec:
+    label: "Start Podman Service"
+    component: dev-tools
+    workingDir: ${PROJECTS_ROOT}
+    commandLine: "unset CONTAINER_HOST && podman --log-level debug system service --time=0 unix:///tmp/podman.sock"
+    group:
+      kind: run
+      isDefault: true
+  id: start-podman
+- exec:
+    label: "Start Localstack Service"
+    component: dev-tools
+    workingDir: ${PROJECTS_ROOT}
+    commandLine: "mkdir -p ${HOME}/.cache/localstack/volume && podman run --rm --name localstack_main -v ${HOME}/.cache/localstack/volume:/var/lib/localstack -v ${DOCKER_SOCK}:${DOCKER_SOCK} -p 0.0.0.0:4566:4566 -p 0.0.0.0:4510-4559:4510-4559 -e ACTIVATE_PRO=0 -e HOSTNAME=${HOSTNAME} -e LOCALSTACK_CLI=1 -e DEBUG=1 -e DOCKER_HOST=${DOCKER_HOST} -e SET_TERM_HANDLER=1 docker.io/localstack/localstack:latest"
+    group:
+      kind: run
+      isDefault: true
+  id: start-localstack
+- apply:
+    component: oc-cli
+    label: Copy OpenShift CLI
+  id: cp-oc-cli
+events:
+  preStart:
+    - cp-oc-cli
