@@ -15,7 +15,7 @@ then
 fi
 USER=$(whoami)
 START_ID=$(( $(id -u)+1 ))
-echo "${USER}:${START_ID}:2147483646" > /etc/subuid
-echo "${USER}:${START_ID}:2147483646" > /etc/subgid
+echo "${USER}:${START_ID}:65536" > /etc/subuid
+echo "${USER}:${START_ID}:65536" > /etc/subgid
 
 exec "$@"
