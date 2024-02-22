@@ -9,6 +9,7 @@ COPY --chown=0:0 entrypoint.sh /entrypoint.sh
 
 RUN microdnf --disableplugin=subscription-manager install -y openssl compat-openssl11 libbrotli git tar which shadow-utils bash zsh wget jq podman buildah skopeo; \
     microdnf update -y ; \
+    rpm --restore shadow-utils \
     microdnf clean all ; \
     mkdir -p ${HOME} ; \
     chmod +x /entrypoint.sh ; \
